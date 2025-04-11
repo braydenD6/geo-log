@@ -1,0 +1,52 @@
+name: CI Pipeline for FastAPI App
+
+# This triggers the workflow when there are pushes to the master branch or pull requests
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Using a latest Ubuntu runner
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    # Set up Python environment
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10'  # Match the Python version in your environment
+
+    # Install dependencies
+    - name: Install dependencies
+      run: |
+        python -m venv .venv
+        source .venv/bin/activate
+        pip install -r requirements.txt
+
+    # Build Docker image (optional if you want to build it every time)
+    - name: Build Docker image
+      run: |
+        docker build -t geo-log-app .
+
+    # Run tests (you can add tests using pytest or any other testing framework)
+    - name: Run tests
+      run: |
+        source .venv/bin/activate
+        pytest
+
+    # Push to Docker Hub (optional)
+    # - name: Push Docker image to Docker Hub
+    #   run: |
+    #     echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+    #     docker tag my-fastapi-app:latest $DOCKER_USERNAME/my-fastapi-app:latest
+    #     docker push $DOCKER_USERNAME/my-fastapi-app:latest
+    #   env:
+    #     DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+    #     DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
