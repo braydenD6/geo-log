@@ -1,4 +1,7 @@
 fastapi
 uvicorn[standard]
 psycopg2-binary  # for Postgres
+
+# Test stuff
 pytest
+httpx
