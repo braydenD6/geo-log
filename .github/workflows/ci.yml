@@ -15,13 +15,13 @@ jobs:
 
     steps:
     - name: Check out code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     # Set up Python environment
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
-        python-version: '3.10'  # Match the Python version in your environment
+        python-version: '3.10'
 
     # Install dependencies
     - name: Install dependencies
@@ -30,23 +30,21 @@ jobs:
         source .venv/bin/activate
         pip install -r requirements.txt
 
-    # Build Docker image (optional if you want to build it every time)
+    # Build Docker image
     - name: Build Docker image
       run: |
         docker build -t geo-log-app .
 
-    # Run tests (you can add tests using pytest or any other testing framework)
+    # Run tests
     - name: Run tests
       run: |
         source .venv/bin/activate
         pytest
 
-    # Push to Docker Hub (optional)
-    # - name: Push Docker image to Docker Hub
-    #   run: |
-    #     echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
-    #     docker tag my-fastapi-app:latest $DOCKER_USERNAME/my-fastapi-app:latest
-    #     docker push $DOCKER_USERNAME/my-fastapi-app:latest
-    #   env:
-    #     DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-    #     DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Set up Fly CLI
+      uses: superfly/flyctl-actions/setup-flyctl@master
+
+    - name: Deploy to Fly.io
+      run: flyctl deploy --remote-only
+      env:
+        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
