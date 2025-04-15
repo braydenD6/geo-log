@@ -26,6 +26,7 @@ jobs:
     # Install dependencies
     - name: Install dependencies
       run: |
+        cd backend
         python -m venv .venv
         source .venv/bin/activate
         pip install -r requirements.txt
@@ -33,11 +34,13 @@ jobs:
     # Build Docker image
     - name: Build Docker image
       run: |
+        cd backend
         docker build -t geo-log-app .
 
     # Run tests
     - name: Run tests
       run: |
+        cd backend
         source .venv/bin/activate
         pytest
 
@@ -45,6 +48,8 @@ jobs:
       uses: superfly/flyctl-actions/setup-flyctl@master
 
     - name: Deploy to Fly.io
-      run: flyctl deploy --remote-only
+      run: |
+        cd backend
+        flyctl deploy --remote-only
       env:
         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
